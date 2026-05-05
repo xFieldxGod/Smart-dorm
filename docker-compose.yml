@@ -1,0 +1,30 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: smartdorm-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: smartdorm
+      POSTGRES_USER: smartdorm
+      POSTGRES_PASSWORD: smartdorm123
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./backend/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./backend/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: smartdorm-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@smartdorm.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+
+volumes:
+  pgdata:
